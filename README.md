@@ -88,3 +88,58 @@ We ingest the csv file followed by the json file respectively.
 
 After injesting all the 8 files, we then transformed the datasets as required
 ![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/tranform1.png)
+
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/transform2.png)
+
+Transofrmation of all the datasets follows the same approach as shown above.
+
+It is worthy to note that we have 8 files to be ingested and transformed, 4 of those files are implemented using full loads while the other four are implemented using incremental loads.
+The way we handle full or bulk loads are different from how we handle incremental loads.
+
+After transformation, we then write the data with full loads to the processed containers in parquet format using the *saveAsTable* syntax which also saves the data as a table in our f1_processed database.
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/full%20load.png)
+
+For the incremental load, we have to approach it by utilizing the advantages of Databricks lakehouse architecture which allows us to append data by using the *merge* syntax incrementally.
+We first define the merge statement as a function as shown below;
+<img src="https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/merge.png">
+
+Then we load all the four incremental load data by calling the function as shown below
+<img src="https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/incremental%20load.png">
+
+Now we have all our data in the processed layer and as well as managed tables in our f1_processed database as well. The next thing is to transform the data further to meet BI reporting inside the presentation layer while also creating tables in our f1_presentation database.
+We created the race_results, drivers and constructors standings which will allow us perform reporting to meet the reporting requirements as shown below.
+
+To create the presentation data for our BI reporting, we read the various data needed for the transformation as shown;
+<img src="https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/prentation%20read.png">
+
+Next we join them and selected the required columns as seen below;
+<img src="https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/presentation%20join.png">
+
+After that, we then write the data to the presentation layer using the incremental load approach we used which will also create managed tables in the f1_presentation database that was created earlier.
+<img src="https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/presentation%20load.png">
+The other presentation files followed the same approach as above.
+
+We then analyzed the dataset to find out the dominant drivers and dominant teams over the years.
+###### Dominant Drivers Analysis and Visualization
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/drivers%20analysis.png)
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/dominant_drivers_viz.png)
+
+##### Dominant Teams Analysis and Visualization
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/team%20analysis.png)
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/dominant_teams_viz.png)
+
+For a more sophisticated reporting, we could connect our databricks workspace to Power BI as well as shown below;
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/connect_to_powerbi_1.png)
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/connect_to_powerbi_2.png)
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/connect_to_powerbi_3.png)
+
+To meet up with our scheduling and orchestration requirements, we have to use ADF pipelines.
+We created pipelines for the ingestion files and transformatipn files as shown below;
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/pipeline_ingestion_all_files.png)
+
+![](https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/pipeline_tranform_files.png)
+
+We then tied both pipelines in a master pipeline with trigger to automate the whole process as shown below;
+<img src="https://github.com/jaykay04/Formula1_Big_Data_Project_Using_Azure_Databricks/blob/main/Images/trigger_master_pipeline.png">
+
+In conclusion, we are able utilize the power of Azure Databricks LakeHouse Architecture to Extract data of different file formats, Transform them and Load them based on full and incrememtal loads.
